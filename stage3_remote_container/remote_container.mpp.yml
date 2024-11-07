@@ -1,0 +1,61 @@
+version: '2'
+mpp-vars:
+  name: remote_container
+  use_containers_extra_store: true
+
+pipelines:
+- name: rootfs
+  build: name:build
+  stages:
+
+  # Install some special RPMs
+  - type: org.osbuild.rpm
+    options:
+      gpgkeys:
+      - mpp-eval: distro_gpg_keys
+      disable_dracut: true
+      exclude:
+        docs: true
+    inputs:
+      packages:
+        type: org.osbuild.files
+        origin: org.osbuild.source
+        mpp-depsolve:
+          architecture: $arch
+          ignore-weak-deps: true
+          module-platform-id: $distro_module_id
+          baseurl: $distro_baseurl_repo
+          repos:
+            mpp-join:
+            - mpp-eval: image_repos
+            - mpp-eval: extra_repos
+          packages:
+            mpp-join:
+            - mpp-eval: image_rpms
+            - - hostname
+              - openssh-clients
+              - openssh-server
+              - podman
+              - vim
+              - wget
+          excludes:
+          - dracut-config-rescue
+
+  # Get the CS10 base container in from a remote container registry
+  # (here quay.io)
+  - type: org.osbuild.skopeo
+    inputs:
+      images:
+        type: org.osbuild.containers
+        origin: org.osbuild.source
+        mpp-resolve-images:
+          images:
+            - source: quay.io/centos/centos
+              tag: stream10-development
+              name: localhost/cs10
+    options:
+      destination:
+        type: containers-storage
+        storage-path:
+          mpp-eval: containers_extra_store
+

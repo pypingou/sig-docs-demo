@@ -1,0 +1,8 @@
+FROM centos:stream9
+
+COPY my_repo /tmp/my_repo
+
+RUN ls -l /tmp && ls -l /tmp/my_repo
+
+RUN dnf install -y /tmp/my_repo/auto-apps-0.1*.rpm && dnf clean all
+

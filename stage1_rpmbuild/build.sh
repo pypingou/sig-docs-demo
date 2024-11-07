@@ -1,5 +1,15 @@
 #!/usr/bin/sh
 
+image=true
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --noimage)
+      image=false
+      shift # past argument
+      ;;
+  esac
+done
+
 
 if [ ! -d "sample-apps" ]; then
   git clone https://gitlab.com/CentOS/automotive/src/sample-apps.git
@@ -24,14 +34,15 @@ mkdir -p /var/tmp/my_repo
 cp -rp ./$arch/* /var/tmp/my_repo/
 createrepo /var/tmp/my_repo
 
-source /etc/os-release
+if [ $image = true ]; then
+  source /etc/os-release
 
-sid="autosd"
-if [ $ID == "fedora" ]; then
-  sid="f"
-fi
+  sid="autosd"
+  if [ $ID == "fedora" ]; then
+    sid="f"
+  fi
 
-automotive-image-builder --verbose --container \
+  automotive-image-builder --verbose --container \
     --include=/var/tmp/my_repo \
     build \
     --distro $sid$VERSION_ID \
@@ -41,4 +52,4 @@ automotive-image-builder --verbose --container \
     --export qcow2 \
     rpmbuild.mpp.yml \
     rpmbuild-image.$arch.qcow2
-
+fi

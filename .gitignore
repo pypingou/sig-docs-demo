@@ -1,2 +1,6 @@
 *~
 *.swp
+*.tar.gz
+*.rpm
+*.qcow2
+sample-apps/

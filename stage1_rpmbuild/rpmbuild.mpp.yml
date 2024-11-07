@@ -1,7 +1,6 @@
 version: '2'
 mpp-vars:
   name: rpmbuild
-  ssh_permit_password_auth: true
 
 pipelines:
 - name: rootfs

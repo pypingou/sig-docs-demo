@@ -1,0 +1,40 @@
+version: '2'
+mpp-vars:
+  name: rpmbuild
+  ssh_permit_password_auth: true
+
+pipelines:
+- name: rootfs
+  build: name:build
+  stages:
+
+  # Install some special RPMs
+  - type: org.osbuild.rpm
+    options:
+      gpgkeys:
+      - mpp-eval: distro_gpg_keys
+      disable_dracut: true
+      exclude:
+        docs: true
+    inputs:
+      packages:
+        type: org.osbuild.files
+        origin: org.osbuild.source
+        mpp-depsolve:
+          architecture: $arch
+          ignore-weak-deps: true
+          module-platform-id: $distro_module_id
+          baseurl: $distro_baseurl_repo
+          repos:
+            mpp-join:
+            - mpp-eval: image_repos
+            - mpp-eval: extra_repos
+            - - id: auto-apps
+                baseurl: file:///var/tmp/my_repo
+          packages:
+            mpp-join:
+            - mpp-eval: image_rpms
+            - mpp-eval: extra_rpms
+            - - auto-apps
+          excludes:
+          - dracut-config-rescue

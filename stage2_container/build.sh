@@ -29,6 +29,8 @@ sudo podman build -t localhost/auto-apps:latest -f Containerfile.$sid$VERSION_ID
 
 sudo podman run -it auto-apps rpm -q auto-apps
 p=$PATH
+arch=$(arch)
+
 
 if [ $image = true ]; then
 

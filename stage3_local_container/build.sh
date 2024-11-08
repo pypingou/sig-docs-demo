@@ -13,6 +13,13 @@ done
 
 set -xe
 
+if [ ! -d "/var/tmp/my_repo" ]; then
+    echo "Running Stage 1 to generate the RPM and RPM repository needed for this stage"
+    pushd ../stage1_rpmbuild
+    sh build.sh --noimage
+    popd
+fi
+
 # First copy locally the RPM repository
 # This is required as we cannot copy into the container files that are local but
 # not placed in the folder where the container is built.
